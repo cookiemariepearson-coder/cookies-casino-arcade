@@ -13,7 +13,7 @@ create table if not exists public.arcade_profiles (
 
 create table if not exists public.arcade_wallets (
   user_id uuid primary key references auth.users(id) on delete cascade,
-  coins integer not null default 0 check (coins >= 0),
+  coins integer not null default 10000 check (coins >= 0),
   lifetime_purchased integer not null default 0,
   lifetime_spent integer not null default 0,
   updated_at timestamptz not null default now()
@@ -148,7 +148,7 @@ begin
   on conflict (id) do nothing;
 
   insert into public.arcade_wallets(user_id, coins)
-  values(new.id, 0)
+  values(new.id, 10000)
   on conflict (user_id) do nothing;
 
   insert into public.arcade_progress(user_id)
@@ -193,7 +193,7 @@ begin
 
   if current_coins is null then
     insert into public.arcade_wallets(user_id, coins)
-    values(p_user_id, 0)
+    values(p_user_id, 10000)
     returning coins into current_coins;
   end if;
 
@@ -311,3 +311,37 @@ public.apply_arcade_wallet_transaction(
   jsonb
 )
 to service_role;
+
+
+-- Give 10,000 starter coins to existing accounts that have never had a wallet transaction.
+update public.arcade_wallets w
+set coins = 10000,
+    updated_at = now()
+where w.coins = 0
+  and not exists (
+    select 1
+    from public.arcade_wallet_transactions t
+    where t.user_id = w.user_id
+  );
+
+insert into public.arcade_wallet_transactions(
+  user_id,
+  amount,
+  type,
+  reference,
+  metadata
+)
+select
+  w.user_id,
+  10000,
+  'starter_bonus',
+  'starter_bonus_v1',
+  '{"description":"New player starter coins"}'::jsonb
+from public.arcade_wallets w
+where w.coins = 10000
+  and not exists (
+    select 1
+    from public.arcade_wallet_transactions t
+    where t.user_id = w.user_id
+      and t.reference = 'starter_bonus_v1'
+  );

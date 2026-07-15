@@ -1397,6 +1397,42 @@ button:active{transform:translateY(1px) scale(.98)}
 }
 
 
+
+const STARTER_COIN_AMOUNT=10000;
+const LOW_COIN_THRESHOLD=1000;
+
+function showEntryCoinOffer(){
+  if(!currentUser)return;
+  entryCoinBalance.textContent=state.coins;
+
+  if(state.coins<=0){
+    entryCoinTitle.textContent='You are out of Cookie Coins';
+    entryCoinText.textContent='Buy a coin pack to continue playing.';
+    entryCoinOffer.querySelector('.entryCoinCard').classList.add('lowCoinPulse');
+  }else if(state.coins<=LOW_COIN_THRESHOLD){
+    entryCoinTitle.textContent='Your Cookie Coins are running low';
+    entryCoinText.textContent='You can keep playing, or refill now before the fun stops.';
+    entryCoinOffer.querySelector('.entryCoinCard').classList.add('lowCoinPulse');
+  }else{
+    entryCoinTitle.textContent="Welcome to Cookie's Casino Arcade!";
+    entryCoinText.textContent='You have '+state.coins.toLocaleString()+' Cookie Coins. Buy more now or jump into a game.';
+    entryCoinOffer.querySelector('.entryCoinCard').classList.remove('lowCoinPulse');
+  }
+
+  entryCoinOffer.classList.add('show');
+}
+
+function closeEntryCoinOffer(){
+  entryCoinOffer.classList.remove('show');
+}
+
+function checkLowCoinPrompt(){
+  if(!currentUser)return;
+  if(state.coins<=LOW_COIN_THRESHOLD){
+    setTimeout(showEntryCoinOffer,550);
+  }
+}
+
 /* ===== PLAYER ACCOUNT + SECURE WALLET ===== */
 .authModal,.accountModal{
   position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;
@@ -1441,6 +1477,26 @@ button:active{transform:translateY(1px) scale(.98)}
 .cloudStatus.error{border-color:#ff709e;color:#ff9dbb}
 .lockedArcade{filter:blur(3px);pointer-events:none;user-select:none}
 @media(max-width:600px){.walletGrid{grid-template-columns:1fr}}
+
+
+.infoMiniBtn{
+  width:34px;height:34px;border-radius:50%;padding:0;font-size:17px;font-weight:1000
+}
+.entryCoinOffer{
+  position:fixed;inset:0;z-index:480;display:none;align-items:center;justify-content:center;
+  padding:18px;background:rgba(0,0,0,.82);backdrop-filter:blur(6px)
+}
+.entryCoinOffer.show{display:flex}
+.entryCoinCard{
+  width:min(520px,96vw);padding:24px;border-radius:28px;text-align:center;
+  background:linear-gradient(180deg,#33043e,#13001a);
+  border:3px solid #ffd23b;box-shadow:0 0 45px #ff2ba666
+}
+.entryCoinCard h2{color:#ffd23b;margin:0 0 8px;font-size:32px}
+.entryCoinCard .balanceBig{font-size:42px;font-weight:1000;color:#62f0cf;margin:14px 0}
+.entryCoinCard p{color:#ffe8bf;line-height:1.45}
+.lowCoinPulse{animation:lowCoinPulse .9s ease-in-out infinite alternate}
+@keyframes lowCoinPulse{to{box-shadow:0 0 28px #ff2ba6;transform:scale(1.03)}}
 
 </style>
 </head>
@@ -1500,6 +1556,20 @@ button:active{transform:translateY(1px) scale(.98)}
 </div>
 
 
+
+<div class="entryCoinOffer" id="entryCoinOffer">
+  <div class="entryCoinCard">
+    <h2 id="entryCoinTitle">Welcome to Cookie's Arcade!</h2>
+    <p id="entryCoinText">Your Cookie Coin balance is ready.</p>
+    <div class="balanceBig">🪙 <span id="entryCoinBalance">0</span></div>
+    <div class="coinActions">
+      <button onclick="closeEntryCoinOffer()">Keep Playing</button>
+      <button onclick="closeEntryCoinOffer();openCoinStore()">Buy Coins</button>
+    </div>
+    <p><small>Cookie Coins are virtual entertainment credits and have no cash value.</small></p>
+  </div>
+</div>
+
 <div class="authModal" id="authModal">
   <div class="authCard">
     <h2>Cookie's Player Account</h2>
@@ -1556,7 +1626,7 @@ button:active{transform:translateY(1px) scale(.98)}
 <div id="start"><div class="startBox"><div class="logo">Cookie's Casino<span>Arcade</span></div><p>Spades, Solitaire, UNO-style cards, and Cookie Crush in one direct-open arcade.</p><button onclick="startPlayerFlow()">🎰 ENTER</button><div style="margin-top:10px"><span class="cloudStatus" id="startCloudStatus">Connecting to secure player system...</span></div></div></div>
 <div id="toast" class="toast"></div>
 <div id="app" class="app">
-<header class="top card"><div class="brand">🍪 Cookie's Casino Arcade</div><div class="bank"><div class="badge" id="coinBadge">🪙 Coins: <span id="coins">0</span></div><button onclick="openCoinStore()">Coin Store</button><button onclick="openAccountModal()" id="accountBtn">My Account</button><span class="accountChip" id="accountChip"><span class="accountAvatar">🍪</span><span id="accountChipName">Guest</span></span><span class="cloudStatus" id="cloudStatus">Offline</span><div class="badge">XP: <span id="xp">0</span></div><div class="badge">VIP: <span id="vip">1</span></div></div></header>
+<header class="top card"><div class="brand">🍪 Cookie's Casino Arcade</div><div class="bank"><div class="badge" id="coinBadge">🪙 Coins: <span id="coins">0</span></div><button onclick="openCoinStore()">Coin Store</button><button onclick="openAccountModal()" id="accountBtn">My Account</button><span class="accountChip" id="accountChip"><span class="accountAvatar">🍪</span><span id="accountChipName">Guest</span></span><button class="infoMiniBtn" onclick="openPlayerStatsHelp()" title="What do Cloud, XP, and VIP mean?">?</button><span class="cloudStatus" id="cloudStatus" title="Your account, coins, XP, VIP level, and settings are saved online.">Cloud status</span><div class="badge" title="XP means Experience Points. Earn XP by playing and winning games.">XP: <span id="xp">0</span></div><div class="badge" title="VIP is your arcade level. Your level rises as you earn XP.">VIP: <span id="vip">1</span></div></div></header>
 <nav class="nav"><button onclick="show('lobby')">Lobby</button><button onclick="openSpades()">Spades</button><button onclick="openSolitaire()">Solitaire</button><button onclick="openUno()">UNO</button><button onclick="openCrushPro()">Cookie Crush</button><button onclick="openBingo()">Bingo</button><button onclick="openWordPuzzle()">Word Puzzle</button><button onclick="openChess()">Chess</button><button onclick="openDominoes()">Dominoes</button><button onclick="toggleSound()" id="soundBtn">🔊 Sound On</button></nav>
 
 <section id="lobby" class="page active">
@@ -1929,7 +1999,7 @@ async function confirmGameEntry(){
     sfx('card');
   }catch(error){
     closeCoinModal();
-    if(/balance|coins/i.test(error.message))openCoinStore();
+    if(/balance|coins/i.test(error.message)){showEntryCoinOffer();}
     toast(error.message.toUpperCase());
     sfx('bad');
   }
@@ -1984,6 +2054,17 @@ let currentProfile=null;
 let authMode='login';
 let progressSaveTimer=null;
 
+
+function openPlayerStatsHelp(){
+  alert(
+    'PLAYER STATUS\n\n'+
+    'Cloud saved: Your account and settings are saved online.\n\n'+
+    'XP: Experience Points earned by playing and winning.\n\n'+
+    'VIP: Your arcade level. Your VIP level rises as XP builds.\n\n'+
+    'Cookie Coins: Virtual game credits with no cash value.'
+  );
+}
+
 function setCloudStatus(text,type=''){
   for(const id of ['cloudStatus','startCloudStatus']){
     const el=$(id);
@@ -2027,41 +2108,59 @@ async function applyAuthSession(session){
   await refreshPlayerAccount();
 
   // After email confirmation or session restoration, enter automatically.
-  const startScreen=$('start');
-  const appScreen=$('app');
-  if(startScreen && appScreen && startScreen.style.display!=='none'){
-    setTimeout(()=>enterArcade(),150);
-  }
+  setCloudStatus('Account ready — press ENTER','online');
 }
 
 async function startPlayerFlow(){
   try{
-    // If the confirmed account is already loaded, enter immediately.
-    if(currentUser){
-      openArcadeScreen();
-      return;
+    if(!supabaseClient){
+      setCloudStatus('Connecting...','');
+      await initPlayerCloud();
     }
 
-    // Check once for a restored Supabase session.
-    if(supabaseClient){
+    if(!currentUser && supabaseClient){
       const result=await supabaseClient.auth.getSession();
       if(result.error)throw result.error;
-
-      if(result.data && result.data.session){
+      if(result.data?.session){
         currentSession=result.data.session;
         currentUser=result.data.session.user;
         await refreshPlayerAccount();
-        openArcadeScreen();
-        return;
       }
     }
 
-    // No active session: show the normal sign-in form.
-    openAuthModal('login');
+    if(!currentUser){
+      openAuthModal('login');
+      return;
+    }
+
+    // Browsers only allow music and sound after a real player click.
+    await activateArcadeAudio();
+    openArcadeScreen();
+    showEntryCoinOffer();
   }catch(error){
     console.error(error);
     openAuthModal('login');
     authMessage.textContent=error.message||'Please sign in.';
+  }
+}
+
+
+async function activateArcadeAudio(){
+  try{
+    initAudio();
+    if(audioCtx && audioCtx.state==='suspended'){
+      await audioCtx.resume();
+    }
+    state.sound=true;
+    state.music=true;
+    if(window.soundBtn)soundBtn.textContent='🔊 Sound On';
+    if(window.musicBtn)musicBtn.textContent='🎵 Music On';
+    startCasinoMusic();
+    tone(330,.08,'triangle',.05);
+    tone(495,.10,'triangle',.05,.06);
+    saveProgressSnapshot();
+  }catch(error){
+    console.warn('Audio activation:',error);
   }
 }
 
@@ -2072,9 +2171,7 @@ function openArcadeScreen(){
   if(startScreen)startScreen.style.display='none';
   if(appScreen)appScreen.style.display='block';
 
-  try{initAudio()}catch(error){console.warn(error)}
   try{sfx('enter')}catch(error){}
-  try{startCasinoMusic()}catch(error){}
   try{toast("Welcome to Cookie's Casino Arcade!")}catch(error){}
   try{createCoinRain()}catch(error){}
   try{casinoAmbience()}catch(error){}
@@ -2124,7 +2221,7 @@ async function submitAuth(event){
       authMessage.textContent='Signed in!';
       closeAuthModal();
       await applyAuthSession(data.session);
-      openArcadeScreen();
+      setCloudStatus('Signed in — press ENTER','online');
     }
   }catch(error){
     authMessage.textContent=error.message||'Account request failed.';
@@ -2180,6 +2277,7 @@ async function refreshPlayerAccount(){
     accountChipName.textContent=name;
     setCloudStatus('Cloud saved','online');
     render();
+    if($('app')?.style.display==='block')checkLowCoinPrompt();
   }catch(error){
     setCloudStatus('Cloud sync error','error');
     console.error(error);

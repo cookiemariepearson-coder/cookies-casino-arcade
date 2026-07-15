@@ -41,3 +41,20 @@ AFTER UPLOADING
 IMPORTANT
 Do not upload the ZIP itself as the only GitHub file.
 Extract the ZIP and upload all folders and files inside it.
+
+
+STARTER COINS UPDATE
+Run the updated supabase_setup.sql again in Supabase SQL Editor.
+It gives new players 10,000 starter Cookie Coins.
+It also gives 10,000 starter coins to existing accounts that have no wallet transaction history.
+
+PLAYER ENTRY
+Players must press ENTER after the account is recognized.
+That click also unlocks browser music and sound.
+
+COIN STORE PROMPTS
+The arcade displays Buy Coins:
+- every time the signed-in player presses ENTER,
+- when the balance reaches 1,000 coins or less,
+- when the player has no coins,
+- when a game entry fails because of insufficient coins.
