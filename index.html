@@ -3692,7 +3692,7 @@ function dominoBotTurn(){
  dominoBotN.splice(i,1);dominoLog.textContent='Bot played. Your turn—choose a glowing domino that matches '+dominoChainN[0][0]+' or '+dominoChainN[dominoChainN.length-1][1]+'.';tone(150,.10,'square',.06);tone(220,.08,'triangle',.05,.05);drawDominoes();if(window.dominoTurn)dominoTurn.textContent='Your turn';if(window.dominoSlowPanel)dominoSlowPanel.textContent='Your turn: match the Left or Right number with a glowing domino.';if(!dominoBotN.length){dominoBotScoreN+=100;toast('BOT WINS DOMINOES');tone(110,.2,'sawtooth',.07);dominoRoundN++;setTimeout(newDominoes,1600)}
 }
 function drawDomino(){if(dominoPool.length){dominoHandN.push(dominoPool.pop());drawDominoes();sfx('card')}else toast('No dominoes left')}
-
+window.addEventListener("DOMContentLoaded", initPlayerCloud);
 </script>
 </body>
 </html>
