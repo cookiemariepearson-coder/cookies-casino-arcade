@@ -1498,6 +1498,118 @@ function checkLowCoinPrompt(){
 .lowCoinPulse{animation:lowCoinPulse .9s ease-in-out infinite alternate}
 @keyframes lowCoinPulse{to{box-shadow:0 0 28px #ff2ba6;transform:scale(1.03)}}
 
+
+/* ===== GAMEPLAY + ANIMATION REBUILD ===== */
+@keyframes gameCardEnter{
+  0%{opacity:0;transform:translateY(-40px) rotate(-8deg) scale(.7)}
+  70%{transform:translateY(5px) rotate(2deg) scale(1.05)}
+  100%{opacity:1;transform:none}
+}
+@keyframes coinPop{
+  0%{transform:scale(1)}
+  35%{transform:scale(1.22);box-shadow:0 0 28px #ffd23b}
+  100%{transform:scale(1)}
+}
+@keyframes turnPulse{
+  from{transform:scale(1);box-shadow:0 0 8px #62f0cf}
+  to{transform:scale(1.04);box-shadow:0 0 30px #62f0cf}
+}
+@keyframes bingoMark{
+  0%{transform:scale(.25) rotate(-25deg);opacity:.2}
+  70%{transform:scale(1.18) rotate(4deg)}
+  100%{transform:scale(1);opacity:1}
+}
+@keyframes winnerFlash{
+  0%,100%{filter:brightness(1)}
+  50%{filter:brightness(1.7);transform:scale(1.02)}
+}
+.cardDealIn,.playedCardClassic,.unoArenaCard,.domino{
+  animation:gameCardEnter .34s ease-out both
+}
+.coinPulse{animation:coinPop .65s ease}
+.turnPulse{animation:turnPulse .8s ease-in-out infinite alternate}
+.bigTurnOverlay{
+  position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);
+  z-index:30;padding:16px 28px;border-radius:20px;
+  background:#090014e8;border:3px solid #ffd23b;color:#ffd23b;
+  font-size:28px;font-weight:1000;box-shadow:0 0 35px #ff2ba699;
+  display:none;pointer-events:none
+}
+.bigTurnOverlay.show{display:block}
+.gameActionFeed{
+  min-height:44px;padding:10px 14px;border-radius:15px;background:#0008;
+  color:#ffe8bf;text-align:center;font-weight:900;margin:10px 0
+}
+.bingoShowdown{
+  border-radius:26px;padding:18px;
+  background:
+    linear-gradient(#0003,#0003),
+    radial-gradient(circle at 50% 0,#8fe9ff 0,#62c9ff 22%,#efb963 55%,#ae6632 100%);
+  border:3px solid #ffd23b
+}
+.bingoTopRail{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:8px;
+  padding:10px;border-radius:18px;background:linear-gradient(180deg,#6d3c14,#2b1608);
+  border:2px solid #e9bc61;margin-bottom:12px
+}
+.bingoInventory{text-align:center;color:white;font-weight:1000}
+.bingoInventory span{display:block;font-size:25px}
+.bingoShowdownHud{
+  display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:10px;align-items:center;
+  margin:10px 0
+}
+.bingoCountdown,.bingoCurrentBall,.bingoRewardBox{
+  padding:12px;border-radius:18px;text-align:center;background:#000b;color:white;
+  border:2px solid #ffd23b;font-weight:1000
+}
+.bingoCurrentBall{font-size:34px;color:#ffd23b}
+.bingoCardsWrap{display:grid;grid-template-columns:repeat(2,minmax(280px,1fr));gap:18px}
+.showdownCard{padding:12px;border-radius:18px;background:linear-gradient(135deg,#9a5c24,#56300f);border:3px solid #f4d98a}
+.showdownCardTitle{text-align:center;color:white;font-size:20px;font-weight:1000;margin-bottom:8px}
+.showdownGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.showdownCell{
+  min-height:58px;display:flex;align-items:center;justify-content:center;
+  border-radius:8px;background:linear-gradient(180deg,#f7d69a,#bf7d37);
+  border:2px solid #6a3710;color:#241000;font-size:22px;font-weight:1000;
+  cursor:pointer;transition:.18s
+}
+.showdownHead{background:#f5f5f5;color:#be2134;cursor:default}
+.showdownCell.called{outline:3px solid #66eaff}
+.showdownCell.marked{
+  color:white;background:radial-gradient(circle,#ffec73,#ff6b24 62%,#8f1800);
+  animation:bingoMark .35s ease-out both
+}
+.bingoHistory{
+  display:flex;gap:7px;overflow:auto;padding:10px;border-radius:14px;background:#0009;margin:12px 0
+}
+.calledBall{
+  min-width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:white;background:linear-gradient(135deg,#ff2ba6,#7620e8);border:2px solid white;font-weight:1000
+}
+.bingoActionRow{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.bingoButton{
+  font-size:24px;padding:14px 34px;background:linear-gradient(#ffe976,#ff9c00);
+  border:3px solid #6a2500
+}
+.unoCenterPlay{
+  display:flex;align-items:center;justify-content:center;gap:18px;margin:12px auto;
+  min-height:170px
+}
+.unoPlayedCard{
+  width:105px;height:145px;border-radius:18px;border:4px solid white;
+  display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:1000;
+  box-shadow:0 12px 28px #0009
+}
+.dominoLayout{position:relative}
+.dominoTurnStrong{
+  font-size:26px!important;padding:14px!important;text-align:center;
+  border:3px solid #62f0cf!important
+}
+@media(max-width:850px){
+  .bingoCardsWrap{grid-template-columns:1fr}
+  .bingoShowdownHud{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
@@ -1768,7 +1880,7 @@ function checkLowCoinPrompt(){
 </div>
 </section>
 
-<section id="uno" class="page"><div class="game card"><div class="gameHead"><h1>🌈 Cookie Color Clash Arena</h1><button onclick="newColorClashMatch()">New Match</button></div><div class="unoFourArena"><div class="clashTurnBanner" id="clashTurnBanner">Cookie’s turn</div><div class="clashDrawNotice" id="clashDrawNotice">No playable card — draw one</div><div class="unoSeat top"><div class="unoMiniAvatar">💄</div><div><span id="clashTopCount">7</span> cards</div></div><div class="unoSeat left"><div class="unoMiniAvatar">💜</div><div><span id="clashLeftCount">7</span> cards</div></div><div class="unoSeat right"><div class="unoMiniAvatar">😂</div><div><span id="clashRightCount">7</span> cards</div></div><div class="unoSeat bottom"><div class="unoMiniAvatar">🍪</div><div><span id="clashPlayerCount">7</span> cards</div></div><div class="clashEffect" id="clashEffect">CLASH!</div><div class="unoArenaCenter"><div id="clashDeck" class="unoArenaCard" onclick="drawClashCard()" style="background:linear-gradient(135deg,#ff2ba6,#ffd23b)">DRAW</div><div id="clashDiscard" class="unoArenaCard">?</div></div><div id="clashHand" class="unoArenaHand"></div></div><div class="stats"><div class="stat"><small>Cookie Score</small><b id="clashCookieScore">0</b></div><div class="stat"><small>Opponent Score</small><b id="clashBotScore">0</b></div><div class="stat"><small>Round</small><b id="clashRound">1</b></div></div><div id="unoStatus" class="log">Match color or number. First side to win three rounds wins.</div></div></section>
+<section id="uno" class="page"><div class="game card"><div class="gameHead"><h1>🌈 Cookie Color Clash Arena</h1><button onclick="newColorClashMatch()">New Match</button></div><div class="unoFourArena"><div class="clashTurnBanner" id="clashTurnBanner">Cookie’s turn</div><div class="clashDrawNotice" id="clashDrawNotice">No playable card — draw one</div><div class="unoSeat top"><div class="unoMiniAvatar">💄</div><div><span id="clashTopCount">7</span> cards</div></div><div class="unoSeat left"><div class="unoMiniAvatar">💜</div><div><span id="clashLeftCount">7</span> cards</div></div><div class="unoSeat right"><div class="unoMiniAvatar">😂</div><div><span id="clashRightCount">7</span> cards</div></div><div class="unoSeat bottom"><div class="unoMiniAvatar">🍪</div><div><span id="clashPlayerCount">7</span> cards</div></div><div class="clashEffect" id="clashEffect">CLASH!</div><div class="unoArenaCenter"><div id="clashDeck" class="unoArenaCard" onclick="drawClashCard()" style="background:linear-gradient(135deg,#ff2ba6,#ffd23b)">DRAW</div><div id="clashDiscard" class="unoArenaCard">?</div></div><div id="clashHand" class="unoArenaHand"></div></div><div class="stats"><div class="stat"><small>Cookie Score</small><b id="clashCookieScore">0</b></div><div class="stat"><small>Opponent Score</small><b id="clashBotScore">0</b></div><div class="stat"><small>Round</small><b id="clashRound">1</b></div></div><div id="clashActionFeed" class="gameActionFeed">Cards played will appear here.</div><div id="unoStatus" class="log">Match color or number. First side to win three rounds wins.</div></div></section>
 
 <section id="crush" class="page">
 <div class="crushWorld card">
@@ -1831,13 +1943,64 @@ function checkLowCoinPrompt(){
 </div>
 </section>
 
-<section id="bingo" class="page"><div class="megaGame card"><div class="gameHead"><h1>🎱 Cookie Bingo</h1><button onclick="newBingo()">New Card</button></div><div class="bingoLayout"><div><div id="bingoCard" class="bingoCard"></div></div><aside class="side card"><div id="bingoBall" class="bingoBall">GO</div><div class="bingoTimer" id="bingoTimer">0:08</div><div class="bingoCallerStatus" id="bingoCallerStatus">Caller stopped</div><button onclick="toggleBingoCaller()" id="bingoCallerBtn">Start Caller</button><div class="stats"><div class="stat"><small>Calls</small><b id="bingoCalls">0</b></div><div class="stat"><small>Marked</small><b id="bingoMarked">0</b></div></div><div id="bingoLog" class="log">Call numbers and mark your card.</div></aside></div></div></section>
+
+<section id="bingo" class="page">
+  <div class="megaGame card">
+    <div class="gameHead">
+      <h1>🎱 Cookie Bingo Showdown</h1>
+      <button onclick="newBingoShowdown()">New Showdown</button>
+    </div>
+
+    <div class="bingoShowdown">
+      <div class="bingoTopRail">
+        <div class="bingoInventory"><span>🚀</span>Power Shot<br><b id="bingoPowerShots">3</b></div>
+        <div class="bingoInventory"><span>🪙</span>Entry<br><b>45</b></div>
+        <div class="bingoInventory"><span>🔥</span>Streak<br><b id="bingoStreak">0</b></div>
+        <div class="bingoInventory"><span>🏆</span>Wins<br><b id="bingoWins">0</b></div>
+        <div class="bingoInventory"><span>🎁</span>Prize<br><b id="bingoPrize">350</b></div>
+      </div>
+
+      <div class="bingoShowdownHud">
+        <div class="bingoCountdown">NEXT CALL<br><span id="bingoTimer">0:04</span></div>
+        <div class="bingoCurrentBall" id="bingoBall">READY</div>
+        <div class="bingoRewardBox">MARKED<br><span id="bingoMarked">0</span></div>
+      </div>
+
+      <div class="gameActionFeed" id="bingoCallerStatus">Press Start Showdown. Numbers call automatically every four seconds.</div>
+      <div class="bingoHistory" id="bingoHistory"></div>
+
+      <div class="bingoCardsWrap">
+        <div class="showdownCard">
+          <div class="showdownCardTitle">COOKIE CARD 1</div>
+          <div class="showdownGrid" id="bingoCardOne"></div>
+        </div>
+        <div class="showdownCard">
+          <div class="showdownCardTitle">COOKIE CARD 2</div>
+          <div class="showdownGrid" id="bingoCardTwo"></div>
+        </div>
+      </div>
+
+      <div class="bingoActionRow">
+        <button onclick="toggleBingoShowdown()" id="bingoCallerBtn">Start Showdown</button>
+        <button onclick="useBingoPowerShot()">🚀 Power Shot</button>
+        <button class="bingoButton" onclick="claimBingoShowdown()">BINGO!</button>
+      </div>
+
+      <div id="bingoLog" class="log">Start the caller, listen for numbers, and tap matching tiles yourself.</div>
+
+      <!-- compatibility -->
+      <span id="bingoCalls" hidden>0</span>
+      <div id="bingoCard" hidden></div>
+    </div>
+  </div>
+</section>
+
 
 <section id="word" class="page"><div class="megaGame card"><div class="gameHead"><h1>🔤 Cookie Word Treasure</h1><button onclick="newWordPuzzle()">New Puzzle</button></div><div class="wordLayout"><div><div id="wordGrid" class="wordGrid"></div></div><aside class="side card"><h3>Find These Words</h3><div id="wordList" class="wordList"></div><div class="stats"><div class="stat"><small>Found</small><b id="wordFound">0</b></div><div class="stat"><small>Time</small><b id="wordTime">0:00</b></div></div><button onclick="wordPuzzleHint()">Hint</button><button onclick="clearWordSelection()">Clear Selection</button><div id="wordLog" class="log">Select letters in a straight line.</div></aside></div></div></section>
 
 <section id="chess" class="page"><div class="megaGame card"><div class="gameHead"><h1>♛ Cookie Quick Chess</h1><button onclick="newChess()">New Game</button></div><div class="chessLayout"><div id="chessBoard" class="chessBoard"></div><aside class="side card"><div class="stats"><div class="stat"><small>Turn</small><b id="chessTurn">White</b></div><div class="stat"><small>Captured</small><b id="chessCaptured">0</b></div></div><p>Click one of your pieces, then click a highlighted square. This arcade version uses simplified legal movement.</p><div id="chessLog" class="log">White moves first.</div></aside></div></div></section>
 
-<section id="dominoes" class="page"><div class="megaGame card"><div class="gameHead"><h1>🁫 Cookie Domino House</h1><button onclick="newDominoes()">New Round</button></div><div class="dominoLayout"><div class="dominoTable"><div class="dominoHelp"><b>How to play:</b> Click a glowing domino that matches either open end. If nothing glows, press Draw Domino.</div><div class="dominoOpenEnds"><span>Left: <b id="dominoLeftEnd">-</b></span><span>Right: <b id="dominoRightEnd">-</b></span></div><div><h3 style="text-align:center">Bot: <span id="dominoBotCount">7</span> dominoes</h3></div><div id="dominoChain" class="dominoChain"></div><div><div id="dominoHand" class="dominoHand"></div></div></div><aside class="side card"><div class="dominoSlowPanel" id="dominoSlowPanel">Step 1: Look at the Left and Right numbers. Step 2: Click a glowing domino that matches.</div><div class="dominoTurn" id="dominoTurn">Your turn</div><div class="dominoScoreboard"><div class="stat"><small>Cookie Score</small><b id="dominoCookieScore">0</b></div><div class="stat"><small>Bot Score</small><b id="dominoBotScore">0</b></div><div class="stat"><small>Round</small><b id="dominoRound">1</b></div></div><div class="stats"><div class="stat"><small>Your Hand</small><b id="dominoCount">7</b></div><div class="stat"><small>Rounds Won</small><b id="dominoWins">0</b></div></div><button onclick="drawDomino()">Draw Domino</button><div id="dominoLog" class="log">Match either open end.</div></aside></div></div></section>
+<section id="dominoes" class="page"><div class="megaGame card"><div class="gameHead"><h1>🁫 Cookie Domino House</h1><button onclick="newDominoes()">New Round</button></div><div class="dominoLayout"><div id="dominoTurnOverlay" class="bigTurnOverlay">BOT PLAYING...</div><div class="dominoTable"><div class="dominoHelp"><b>How to play:</b> Click a glowing domino that matches either open end. If nothing glows, press Draw Domino.</div><div class="dominoOpenEnds"><span>Left: <b id="dominoLeftEnd">-</b></span><span>Right: <b id="dominoRightEnd">-</b></span></div><div><h3 style="text-align:center">Bot: <span id="dominoBotCount">7</span> dominoes</h3></div><div id="dominoChain" class="dominoChain"></div><div><div id="dominoHand" class="dominoHand"></div></div></div><aside class="side card"><div class="dominoSlowPanel" id="dominoSlowPanel">Step 1: Look at the Left and Right numbers. Step 2: Click a glowing domino that matches.</div><div class="dominoTurn dominoTurnStrong turnPulse" id="dominoTurn">Your turn</div><div class="dominoScoreboard"><div class="stat"><small>Cookie Score</small><b id="dominoCookieScore">0</b></div><div class="stat"><small>Bot Score</small><b id="dominoBotScore">0</b></div><div class="stat"><small>Round</small><b id="dominoRound">1</b></div></div><div class="stats"><div class="stat"><small>Your Hand</small><b id="dominoCount">7</b></div><div class="stat"><small>Rounds Won</small><b id="dominoWins">0</b></div></div><button onclick="drawDomino()">Draw Domino</button><div id="dominoLog" class="log">Match either open end.</div></aside></div></div></section>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2421,6 +2584,25 @@ function walletRequestId(prefix){
   return prefix+'_'+Date.now()+'_'+cryptoRandomId();
 }
 
+
+function animateCoinBalance(change){
+  const badge=$('coinBadge');
+  if(!badge)return;
+  badge.classList.remove('coinPulse');
+  void badge.offsetWidth;
+  badge.classList.add('coinPulse');
+
+  const float=document.createElement('div');
+  float.textContent=(change>0?'+':'')+Number(change).toLocaleString()+' COINS';
+  float.style.cssText='position:fixed;right:25px;top:85px;z-index:9999;font-size:25px;font-weight:1000;color:'+(change>0?'#62f0cf':'#ff8ebd')+';text-shadow:0 2px 4px #000;transition:1.2s;pointer-events:none';
+  document.body.appendChild(float);
+  requestAnimationFrame(()=>{
+    float.style.transform='translateY(-65px)';
+    float.style.opacity='0';
+  });
+  setTimeout(()=>float.remove(),1300);
+}
+
 async function secureGameEntry(gameKey){
   const data=await secureFetch('/api/wallet-transaction',{
     method:'POST',
@@ -2431,6 +2613,7 @@ async function secureGameEntry(gameKey){
     })
   });
   state.coins=Number(data.wallet.coins);
+  animateCoinBalance(-(gameEntryCosts[gameKey]||0));
   render();
   return data;
 }
@@ -2448,6 +2631,7 @@ async function secureGameReward(coins,gameKey='arcade'){
       })
     });
     state.coins=Number(data.wallet.coins);
+    animateCoinBalance(Number(coins)||0);
     render();
   }catch(error){
     console.warn('Reward was not added:',error.message);
@@ -2591,6 +2775,28 @@ function rotateSpadesPartners(){
   pPartnerRotation=(pPartnerRotation+1)%3;pScores=[0,0];pBags=[0,0];pHandNum=1;
   toast('NEW PARTNERSHIP!');speakLine('Cookie wins the game!',0);setTimeout(newSpadesPremium,1500)
 }
+
+let premiumWatchdogTimer=null;
+
+function startPremiumWatchdog(){
+  if(premiumWatchdogTimer)clearInterval(premiumWatchdogTimer);
+  premiumWatchdogTimer=setInterval(()=>{
+    const page=$('spades');
+    if(!page||!page.classList.contains('active')||pWaitingBid)return;
+
+    if(pPlayed.length===4&&!pRoundLocked){
+      pRoundLocked=true;
+      setTimeout(resolvePremiumTrick,300);
+      return;
+    }
+
+    if(!pRoundLocked&&pCurrent!==0&&pHands[pCurrent]?.length){
+      premiumSpadesMessage.textContent=premiumNames[pCurrent]+' is choosing a card...';
+      premiumAITurn();
+    }
+  },3200);
+}
+
 function newSpadesPremium(){
   pDeck=deck();
   pHands=[[],[],[],[]];
@@ -2607,6 +2813,7 @@ function newSpadesPremium(){
   premiumRoundSummary.textContent='Cookie Team '+pScores[0]+' • Opp Team '+pScores[1]+' • Playing to 250';
   sfx('card');
   drawPremiumSpades();
+  startPremiumWatchdog();
 }
 
 function estimateBid(hand){
@@ -3068,45 +3275,51 @@ function autoWasteFoundation(){
 }
 
 function drawSol(){
-  solScoreFixed.textContent=solScoreFixedN;
-  solMovesFixed.textContent=solMovesFixedN;
-  solFoundationFixed.textContent=found.reduce((n,p)=>n+p.length,0)+'/52';
+  const scoreEl=$('solScoreFixed');
+  const movesEl=$('solMovesFixed');
+  const foundationEl=$('solFoundationFixed');
+  const stockEl=$('stock');
+  const wasteEl=$('waste');
+  const boardEl=$('solBoard');
 
-  stock.textContent=sd.length?'🂠':'↻';
+  if(!scoreEl||!movesEl||!foundationEl||!stockEl||!wasteEl||!boardEl)return;
+
+  scoreEl.textContent=solScoreFixedN;
+  movesEl.textContent=solMovesFixedN;
+  foundationEl.textContent=found.reduce((n,p)=>n+p.length,0)+'/52';
+
+  stockEl.textContent=sd.length?'🂠':'↻';
+  stockEl.className='solSlotV3 '+(sd.length?'solBackV3':'');
 
   const wasteTop=waste[waste.length-1];
-  waste.innerHTML=wasteTop?htmlCard(wasteTop):'Waste';
-  waste.className='solSlotV3'+(wasteTop?' card ':'')+(wasteTop?(red(wasteTop)?'red':'black'):'');
-  if(sel?.type==='waste')waste.classList.add('selected');
+  wasteEl.innerHTML=wasteTop?htmlCard(wasteTop):'Waste';
+  wasteEl.className='solSlotV3'+(wasteTop?' card ':'')+(wasteTop?(red(wasteTop)?'red':'black'):'');
+  if(sel?.type==='waste')wasteEl.classList.add('selected');
 
   for(let i=0;i<4;i++){
     const el=$('f'+i);
     const top=found[i][found[i].length-1];
     el.innerHTML=top?htmlCard(top):suits[i];
     el.className='solSlotV3'+(top?' card ':'')+(top?(red(top)?'red':'black'):'');
-    if(sel && canMoveToFoundation(i))el.classList.add('validTarget');
+    if(sel&&canMoveToFoundation(i))el.classList.add('validTarget');
   }
 
-  solBoard.innerHTML='';
+  boardEl.innerHTML='';
   piles.forEach((pile,pi)=>{
     const col=document.createElement('div');
     col.className='solColumnV3';
-    if(sel && canMoveToPile(pi))col.classList.add('validTarget');
+    if(sel&&canMoveToPile(pi))col.classList.add('validTarget');
     col.onclick=()=>moveToPile(pi);
 
     pile.forEach((c,ci)=>{
       const card=document.createElement('div');
-      const selected=sel?.type==='pile' && sel.pi===pi && sel.ci===ci;
+      const selected=sel?.type==='pile'&&sel.pi===pi&&sel.ci===ci;
       card.className='solCardV3 cardDealIn '+(c.face?(red(c)?'red':'black'):'solBackV3')+(selected?' selected':'');
       card.innerHTML=c.face?htmlCard(c):'🂠';
-      if(c.face)card.classList.add('playable');
-
-      card.onclick=(ev)=>{
-        ev.stopPropagation();
-        selectPileCard(pi,ci);
-      };
-
-      card.ondblclick=(ev)=>{
+      card.style.marginTop=ci===0?'0':'-72px';
+      card.style.zIndex=ci+1;
+      card.onclick=ev=>{ev.stopPropagation();selectPileCard(pi,ci)};
+      card.ondblclick=ev=>{
         ev.stopPropagation();
         if(ci!==pile.length-1)return;
         sel={type:'pile',pi,ci};
@@ -3114,12 +3327,14 @@ function drawSol(){
         if(canMoveToFoundation(fi))moveToFoundation(fi);
         else clearSelection();
       };
-
       col.appendChild(card);
     });
-
-    solBoard.appendChild(col);
+    boardEl.appendChild(col);
   });
+
+  if(!piles.some(p=>p.length)){
+    solLog.textContent='Dealing cards...';
+  }
 }
 
 function solitaireHint(){
@@ -3273,19 +3488,29 @@ function drawClash(){
   clashRound.textContent=clashRoundN;
 
   clashDiscard.textContent=clashText(clashDiscardN);
-  clashDiscard.style.background=clashDiscardN.color==='wild'?'black':clashDiscardN.color;
+  clashDiscard.style.background=clashDiscardN.color==='wild'?'linear-gradient(135deg,#f33,#fc0,#1bdb75,#287cff)':clashDiscardN.color;
+  clashDiscard.classList.remove('cardDealIn');
+  void clashDiscard.offsetWidth;
+  clashDiscard.classList.add('cardDealIn');
 
   clashHand.innerHTML='';
   clashHandN.forEach((c,i)=>{
     const e=document.createElement('div');
-    const playable=clashTurn==='cookie' && !clashBusy && clashValid(c);
+    const playable=clashTurn==='cookie'&&!clashBusy&&clashValid(c);
     e.className='unoArenaCard cardDealIn '+(c.color==='wild'?'wild ':'')+(playable?'playable':'disabled');
-    e.style.background=c.color==='wild'?'black':c.color;
+    e.style.background=c.color==='wild'?'linear-gradient(135deg,#f33,#fc0,#1bdb75,#287cff)':c.color;
     e.textContent=clashText(c);
     e.onclick=()=>playClash(i);
     clashHand.appendChild(e);
   });
 
+  const feed=$('clashActionFeed');
+  if(feed){
+    feed.textContent=clashTurn==='cookie'
+      ? 'YOUR TURN — match the color, number, or action symbol.'
+      : 'OPPONENTS ARE PLAYING — watch the center card.';
+    feed.className='gameActionFeed '+(clashTurn==='cookie'?'turnPulse':'');
+  }
   updateClashTurnText();
 }
 
@@ -3362,7 +3587,7 @@ function drawClashCard(){
     clashTurn='bot';
     clashBusy=true;
     drawClash();
-    setTimeout(clashBotTurn,1700);
+    setTimeout(clashBotTurn,2800);
   }
 }
 
@@ -3404,7 +3629,7 @@ function clashBotTurn(){
     clashBusy=true;
     clashTurn='bot';
     drawClash();
-    setTimeout(clashBotTurn,1700);
+    setTimeout(clashBotTurn,2800);
     return;
   }
 
@@ -3412,7 +3637,7 @@ function clashBotTurn(){
     clashBusy=true;
     clashTurn='bot';
     drawClash();
-    setTimeout(clashBotTurn,1700);
+    setTimeout(clashBotTurn,2800);
     return;
   }
 
@@ -3756,75 +3981,243 @@ function nextCrushLevel(){
 /* ===== BINGO ===== */
 
 let bingoTimerN=3,bingoCallerTimer=null,bingoGameTimer=null;
+
+let showdownCards=[[],[]];
+let showdownMarks=[new Set(),new Set()];
+let showdownCalled=new Set();
+let showdownHistory=[];
+let showdownTimer=null;
+let showdownSeconds=4;
+let showdownRunning=false;
+let showdownWins=0;
+let showdownStreak=0;
+let showdownPowerShots=3;
+
+function generateShowdownCard(){
+  const ranges=[[1,15],[16,30],[31,45],[46,60],[61,75]];
+  const cols=[];
+  for(let c=0;c<5;c++){
+    const nums=[];
+    while(nums.length<5){
+      const n=Math.floor(Math.random()*(ranges[c][1]-ranges[c][0]+1))+ranges[c][0];
+      if(!nums.includes(n))nums.push(n);
+    }
+    cols.push(nums.sort((a,b)=>a-b));
+  }
+  return cols;
+}
+
+function newBingoShowdown(){
+  stopBingoShowdown();
+  showdownCards=[generateShowdownCard(),generateShowdownCard()];
+  showdownMarks=[new Set(['2-2']),new Set(['2-2'])];
+  showdownCalled=new Set();
+  showdownHistory=[];
+  showdownSeconds=4;
+  showdownPowerShots=3;
+  bingoBall.textContent='READY';
+  bingoLog.textContent='Press Start Showdown. Numbers call automatically every four seconds.';
+  bingoCallerStatus.textContent='Caller ready. You must mark matching tiles yourself.';
+  renderBingoShowdown();
+}
+
+function renderBingoShowdown(){
+  [bingoCardOne,bingoCardTwo].forEach((root,cardIndex)=>{
+    root.innerHTML='';
+    'BINGO'.split('').forEach(letter=>{
+      const e=document.createElement('div');
+      e.className='showdownCell showdownHead';
+      e.textContent=letter;
+      root.appendChild(e);
+    });
+
+    for(let r=0;r<5;r++){
+      for(let c=0;c<5;c++){
+        const key=r+'-'+c;
+        const cell=document.createElement('div');
+        const number=showdownCards[cardIndex][c][r];
+        cell.className='showdownCell';
+        if(r===2&&c===2){
+          cell.textContent='FREE';
+          cell.classList.add('marked');
+        }else{
+          cell.textContent=number;
+          if(showdownCalled.has(number))cell.classList.add('called');
+        }
+        if(showdownMarks[cardIndex].has(key))cell.classList.add('marked');
+        cell.onclick=()=>markShowdownTile(cardIndex,r,c);
+        root.appendChild(cell);
+      }
+    }
+  });
+
+  bingoMarked.textContent=showdownMarks[0].size+showdownMarks[1].size-2;
+  bingoHistory.innerHTML=showdownHistory.slice(-18).map(n=>{
+    const letter=n<=15?'B':n<=30?'I':n<=45?'N':n<=60?'G':'O';
+    return '<div class="calledBall">'+letter+n+'</div>';
+  }).join('');
+  bingoPowerShots.textContent=showdownPowerShots;
+  bingoWins.textContent=showdownWins;
+  bingoStreak.textContent=showdownStreak;
+}
+
+function markShowdownTile(cardIndex,r,c){
+  const key=r+'-'+c;
+  if(r===2&&c===2)return;
+  const number=showdownCards[cardIndex][c][r];
+
+  if(!showdownCalled.has(number)){
+    bingoLog.textContent='That number has not been called yet.';
+    sfx('bad');
+    return;
+  }
+
+  if(showdownMarks[cardIndex].has(key)){
+    showdownMarks[cardIndex].delete(key);
+  }else{
+    showdownMarks[cardIndex].add(key);
+    sfx('click');
+  }
+  renderBingoShowdown();
+}
+
+function callShowdownNumber(){
+  if(showdownCalled.size>=75){
+    stopBingoShowdown();
+    bingoLog.textContent='All numbers were called. Start a new showdown.';
+    return;
+  }
+  let n;
+  do{n=1+Math.floor(Math.random()*75)}while(showdownCalled.has(n));
+  showdownCalled.add(n);
+  showdownHistory.push(n);
+  const letter=n<=15?'B':n<=30?'I':n<=45?'N':n<=60?'G':'O';
+  bingoBall.textContent=letter+' '+n;
+  bingoCallerStatus.textContent='Called '+letter+' '+n+' — tap matching tiles on either card.';
+  bingoLog.textContent='Listen, find '+letter+' '+n+', and mark it yourself.';
+  speakBingo(letter+' '+n);
+  sfx('win');
+  renderBingoShowdown();
+}
+
+function toggleBingoShowdown(){
+  if(showdownRunning){
+    stopBingoShowdown();
+    return;
+  }
+  showdownRunning=true;
+  bingoCallerBtn.textContent='Pause Caller';
+  bingoCallerStatus.textContent='Showdown running';
+  callShowdownNumber();
+  showdownSeconds=4;
+  bingoTimer.textContent='0:04';
+
+  showdownTimer=setInterval(()=>{
+    showdownSeconds--;
+    if(showdownSeconds<=0){
+      callShowdownNumber();
+      showdownSeconds=4;
+    }
+    bingoTimer.textContent='0:'+String(showdownSeconds).padStart(2,'0');
+  },1000);
+}
+
+function stopBingoShowdown(){
+  showdownRunning=false;
+  if(showdownTimer){
+    clearInterval(showdownTimer);
+    showdownTimer=null;
+  }
+  if(window.bingoCallerBtn)bingoCallerBtn.textContent='Start Showdown';
+}
+
+function showdownHasLine(cardIndex){
+  const marks=showdownMarks[cardIndex];
+  const line=items=>items.every(([r,c])=>marks.has(r+'-'+c));
+  for(let r=0;r<5;r++)if(line(Array.from({length:5},(_,c)=>[r,c])))return true;
+  for(let c=0;c<5;c++)if(line(Array.from({length:5},(_,r)=>[r,c])))return true;
+  if(line(Array.from({length:5},(_,i)=>[i,i])))return true;
+  if(line(Array.from({length:5},(_,i)=>[i,4-i])))return true;
+  return false;
+}
+
+function claimBingoShowdown(){
+  const winner=showdownHasLine(0)||showdownHasLine(1);
+  if(!winner){
+    bingoLog.textContent='No completed Bingo line yet. Keep listening and marking.';
+    sfx('bad');
+    return;
+  }
+
+  stopBingoShowdown();
+  showdownWins++;
+  showdownStreak++;
+  bingoLog.textContent='BINGO! Cookie wins 350 coins. A new showdown starts shortly.';
+  bingoCallerStatus.textContent='BINGO WIN!';
+  speakBingo('Bingo! Cookie wins!');
+  sfx('enter');
+  sparks(50);
+  reward(350,45);
+  document.querySelector('.bingoShowdown').style.animation='winnerFlash .6s ease 3';
+
+  setTimeout(()=>{
+    document.querySelector('.bingoShowdown').style.animation='';
+    newBingoShowdown();
+  },2800);
+}
+
+function useBingoPowerShot(){
+  if(showdownPowerShots<=0){
+    bingoLog.textContent='No Power Shots remaining this showdown.';
+    sfx('bad');
+    return;
+  }
+  showdownPowerShots--;
+  let candidates=[];
+  showdownCards.forEach((card,cardIndex)=>{
+    for(let r=0;r<5;r++)for(let c=0;c<5;c++){
+      if(r===2&&c===2)continue;
+      const key=r+'-'+c,n=card[c][r];
+      if(showdownCalled.has(n)&&!showdownMarks[cardIndex].has(key)){
+        candidates.push({cardIndex,r,c});
+      }
+    }
+  });
+
+  if(!candidates.length){
+    bingoLog.textContent='Power Shot saved—there are no unmarked called tiles right now.';
+    showdownPowerShots++;
+  }else{
+    const pick=candidates[Math.floor(Math.random()*candidates.length)];
+    showdownMarks[pick.cardIndex].add(pick.r+'-'+pick.c);
+    bingoLog.textContent='Power Shot marked one called tile!';
+    sfx('crunch');
+    sparks(10);
+  }
+  renderBingoShowdown();
+}
+
 function speakBingo(text){
   if(!('speechSynthesis' in window))return;
   speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(text);u.rate=.82;u.pitch=1.08;u.volume=1;
   const voices=speechSynthesis.getVoices();if(voices.length)u.voice=voices.find(v=>/zira|aria|jenny|samantha|female/i.test(v.name))||voices[0];
   speechSynthesis.speak(u)
 }
-function toggleBingoCaller(){
-  if(bingoCallerTimer){stopBingoCaller();return}
-  bingoCallerTimer=true;
-  bingoCallerBtn.textContent='Stop Caller';
-  bingoCallerStatus.textContent='Caller running';
-  bingoTimerN=3;
-  bingoTimer.textContent='0:03';
-  callBingoBall();
 
-  bingoGameTimer=setInterval(()=>{
-    bingoTimerN--;
-    if(bingoTimerN<=0){
-      callBingoBall();
-      bingoTimerN=3;
-    }
-    bingoTimer.textContent='0:'+String(bingoTimerN).padStart(2,'0');
-  },1000);
-}
-function stopBingoCaller(){
-  if(bingoGameTimer)clearInterval(bingoGameTimer);bingoGameTimer=null;bingoCallerTimer=null;bingoCallerBtn.textContent='Start Caller';bingoCallerStatus.textContent='Caller stopped'
-}
+
 
 let bingoNums=[],bingoCalled=new Set(),bingoMarks=new Set(),bingoCallN=0;
-function openBingo(){requestGameEntry('bingo',()=>{show('bingo');newBingo()})}
-function newBingo(){
-  stopBingoCaller();bingoCalled=new Set();bingoMarks=new Set();bingoCallN=0;bingoNums=[];bingoTimerN=3;if(window.bingoTimer)bingoTimer.textContent='0:03';
-  const ranges=[[1,15],[16,30],[31,45],[46,60],[61,75]];
-  for(let c=0;c<5;c++){
-    let nums=[];while(nums.length<5){let n=Math.floor(Math.random()*(ranges[c][1]-ranges[c][0]+1))+ranges[c][0];if(!nums.includes(n))nums.push(n)}
-    nums.sort((a,b)=>a-b);bingoNums.push(nums);
-  }
-  drawBingo();bingoBall.textContent='GO';bingoLog.textContent='Press Call Number.';
+function openBingo(){
+  requestGameEntry('bingo',()=>{
+    show('bingo');
+    newBingoShowdown();
+  });
 }
-function drawBingo(){
-  bingoCard.innerHTML='';
-  'BINGO'.split('').forEach(x=>{let e=document.createElement('div');e.className='bingoCell bingoHead';e.textContent=x;bingoCard.appendChild(e)});
-  for(let r=0;r<5;r++)for(let c=0;c<5;c++){
-    let key=r+'-'+c,e=document.createElement('div');e.className='bingoCell'+(bingoMarks.has(key)?' marked':'');
-    if(r===2&&c===2){e.textContent='FREE';bingoMarks.add(key)}
-    else e.textContent=bingoNums[c][r];
-    e.onclick=()=>markBingo(r,c);bingoCard.appendChild(e);
-  }
-  bingoCalls.textContent=bingoCallN;bingoMarked.textContent=bingoMarks.size;
-}
-function callBingoBall(){
-  if(bingoCalled.size>=75){toast('All numbers called');return}
-  let n;do{n=1+Math.floor(Math.random()*75)}while(bingoCalled.has(n));
-  bingoCalled.add(n);bingoCallN++;let l=n<=15?'B':n<=30?'I':n<=45?'N':n<=60?'G':'O';
-  bingoBall.textContent=l+' '+n;bingoLog.textContent='Called '+l+' '+n+'. Tap the matching tile on your card.';speakBingo(l+' '+n);sfx('win');
-}
-function markBingo(r,c){
-  let key=r+'-'+c,n=bingoNums[c][r];
-  if(r===2&&c===2||bingoCalled.has(n)){bingoMarks.add(key);sfx('click');drawBingo();checkBingo()}
-  else{toast('That number has not been called');sfx('bad')}
-}
-function checkBingo(){
-  const line=arr=>arr.every(([r,c])=>bingoMarks.has(r+'-'+c));
-  let win=false;
-  for(let r=0;r<5;r++)win=win||line(Array.from({length:5},(_,c)=>[r,c]));
-  for(let c=0;c<5;c++)win=win||line(Array.from({length:5},(_,r)=>[r,c]));
-  win=win||line(Array.from({length:5},(_,i)=>[i,i]))||line(Array.from({length:5},(_,i)=>[i,4-i]));
-  if(win){stopBingoCaller();toast('BINGO! YOU WIN!');reward(350,45);sparks(32);sfx('enter');speakBingo('Bingo! You win!');bingoLog.textContent='BINGO! New game starting...';setTimeout(()=>{newBingo();toggleBingoCaller()},2600)}
-}
+
+
+
+
+
 
 /* ===== WORD PUZZLE ===== */
 let wordSize=9,wordLevelN=1,wordWords=[],wordLetters=[],wordSel=[],wordFoundSet=new Set(),wordStart=0,wordTimer=null,wordPlaced=[];
@@ -3923,10 +4316,22 @@ function chessBot(){
 
 /* ===== DOMINOES ===== */
 let dominoHandN=[],dominoBotN=[],dominoChainN=[],dominoPool=[],dominoWinsN=0,dominoCookieScoreN=0,dominoBotScoreN=0,dominoRoundN=1;
+let dominoBusyN=false;
 function allDominoes(){let a=[];for(let i=0;i<=6;i++)for(let j=i;j<=6;j++)a.push([i,j]);return a.sort(()=>Math.random()-.5)}
 function openDominoes(){requestGameEntry('dominoes',()=>{show('dominoes');newDominoes()})}
 function newDominoes(){
- let d=allDominoes();dominoHandN=d.splice(0,7);dominoBotN=d.splice(0,7);dominoPool=d;dominoChainN=[dominoPool.pop()];drawDominoes();dominoLog.textContent='Your turn. Match the left or right open number.';if(window.dominoSlowPanel)dominoSlowPanel.textContent='Step 1: Read the open ends. Step 2: Click a glowing domino.';
+  dominoBusyN=false;
+  const d=allDominoes();
+  dominoHandN=d.splice(0,7);
+  dominoBotN=d.splice(0,7);
+  dominoPool=d;
+  dominoChainN=[dominoPool.pop()];
+  drawDominoes();
+  dominoLog.textContent='YOUR TURN. Match the left or right open number.';
+  dominoTurn.textContent='YOUR TURN';
+  dominoTurn.classList.add('turnPulse');
+  dominoTurnOverlay.classList.remove('show');
+  dominoSlowPanel.textContent='Step 1: Read the two open numbers. Step 2: Click one glowing domino.';
 }
 function dominoHTML(d,cls=''){return '<div class="domino '+cls+'" style="background:linear-gradient(#fff8df,#d8f0ff);border-color:#74d7ff"><span>'+d[0]+'</span><span class="dominoLine"></span><span>'+d[1]+'</span></div>'}
 function canDomino(d){let l=dominoChainN[0][0],r=dominoChainN[dominoChainN.length-1][1];return d[0]===l||d[1]===l||d[0]===r||d[1]===r}
@@ -3936,19 +4341,86 @@ function drawDominoes(){
  dominoHand.innerHTML='';dominoHandN.forEach((d,i)=>{let e=document.createElement('div');e.innerHTML=dominoHTML(d,canDomino(d)?'playable':'');e.firstChild.onclick=()=>playDomino(i);dominoHand.appendChild(e.firstChild)});
 }
 function playDomino(i){
- let d=dominoHandN[i],l=dominoChainN[0][0],r=dominoChainN[dominoChainN.length-1][1],placed=false;
- if(d[1]===l){dominoChainN.unshift(d);placed=true}else if(d[0]===l){dominoChainN.unshift([d[1],d[0]]);placed=true}else if(d[0]===r){dominoChainN.push(d);placed=true}else if(d[1]===r){dominoChainN.push([d[1],d[0]]);placed=true}
- if(!placed){toast('That domino does not match');sfx('bad');return}
- dominoHandN.splice(i,1);sfx('card');drawDominoes();
- if(!dominoHandN.length){dominoWinsN++;dominoCookieScoreN+=100;toast('COOKIE WINS DOMINOES!');reward(350,50);sparks(25);tone(523,.12,'triangle',.07);tone(784,.12,'triangle',.07,.1);dominoRoundN++;setTimeout(newDominoes,1600);return}
- if(window.dominoTurn)dominoTurn.textContent='Bot is thinking...';dominoSlowPanel.textContent='Bot is thinking. Your turn will begin after the bot finishes.';setTimeout(dominoBotTurn,2600);
+  if(dominoBusyN){
+    dominoLog.textContent='Please wait—the bot is still playing.';
+    return;
+  }
+
+  const d=dominoHandN[i];
+  const l=dominoChainN[0][0];
+  const r=dominoChainN[dominoChainN.length-1][1];
+  let placed=false;
+
+  if(d[1]===l){dominoChainN.unshift(d);placed=true}
+  else if(d[0]===l){dominoChainN.unshift([d[1],d[0]]);placed=true}
+  else if(d[0]===r){dominoChainN.push(d);placed=true}
+  else if(d[1]===r){dominoChainN.push([d[1],d[0]]);placed=true}
+
+  if(!placed){
+    dominoLog.textContent='That domino does not match '+l+' or '+r+'.';
+    sfx('bad');
+    return;
+  }
+
+  dominoHandN.splice(i,1);
+  sfx('card');
+  drawDominoes();
+
+  if(!dominoHandN.length){
+    dominoWinsN++;
+    dominoCookieScoreN+=100;
+    dominoLog.textContent='COOKIE WINS THE ROUND!';
+    reward(350,50);
+    sparks(30);
+    sfx('win');
+    dominoRoundN++;
+    setTimeout(newDominoes,2600);
+    return;
+  }
+
+  dominoBusyN=true;
+  dominoTurn.textContent='BOT TURN';
+  dominoTurn.classList.remove('turnPulse');
+  dominoTurnOverlay.textContent='BOT IS THINKING...';
+  dominoTurnOverlay.classList.add('show');
+  dominoSlowPanel.textContent='Watch the board. The bot will place one domino, then your turn returns.';
+  setTimeout(dominoBotTurn,4200);
 }
 function dominoBotTurn(){
- let playable=dominoBotN.map((d,i)=>({d,i})).filter(x=>canDomino(x.d));let i=playable.length?playable.sort((a,b)=>(b.d[0]+b.d[1])-(a.d[0]+a.d[1]))[0].i:-1;
- if(i<0){if(dominoPool.length)dominoBotN.push(dominoPool.pop());dominoLog.textContent='Bot could not play and drew a domino.';drawDominoes();if(window.dominoTurn)dominoTurn.textContent='Your turn';if(window.dominoSlowPanel)dominoSlowPanel.textContent='Your turn: choose a glowing domino or draw if none glow.';return}
- let d=dominoBotN[i],l=dominoChainN[0][0],r=dominoChainN[dominoChainN.length-1][1];
- if(d[1]===l)dominoChainN.unshift(d);else if(d[0]===l)dominoChainN.unshift([d[1],d[0]]);else if(d[0]===r)dominoChainN.push(d);else dominoChainN.push([d[1],d[0]]);
- dominoBotN.splice(i,1);dominoLog.textContent='Bot played. Your turn—choose a glowing domino that matches '+dominoChainN[0][0]+' or '+dominoChainN[dominoChainN.length-1][1]+'.';tone(150,.10,'square',.06);tone(220,.08,'triangle',.05,.05);drawDominoes();if(window.dominoTurn)dominoTurn.textContent='Your turn';if(window.dominoSlowPanel)dominoSlowPanel.textContent='Your turn: match the Left or Right number with a glowing domino.';if(!dominoBotN.length){dominoBotScoreN+=100;toast('BOT WINS DOMINOES');tone(110,.2,'sawtooth',.07);dominoRoundN++;setTimeout(newDominoes,1600)}
+  let playable=dominoBotN.map((d,i)=>({d,i})).filter(x=>canDomino(x.d));
+  const index=playable.length
+    ? playable.sort((a,b)=>(b.d[0]+b.d[1])-(a.d[0]+a.d[1]))[0].i
+    : -1;
+
+  if(index<0){
+    if(dominoPool.length)dominoBotN.push(dominoPool.pop());
+    dominoLog.textContent='The bot could not match and drew one domino.';
+  }else{
+    const d=dominoBotN[index];
+    const l=dominoChainN[0][0],r=dominoChainN[dominoChainN.length-1][1];
+    if(d[1]===l)dominoChainN.unshift(d);
+    else if(d[0]===l)dominoChainN.unshift([d[1],d[0]]);
+    else if(d[0]===r)dominoChainN.push(d);
+    else dominoChainN.push([d[1],d[0]]);
+    dominoBotN.splice(index,1);
+    dominoLog.textContent='Bot played '+d[0]+'–'+d[1]+'. Now match '+dominoChainN[0][0]+' or '+dominoChainN[dominoChainN.length-1][1]+'.';
+    sfx('card');
+  }
+
+  drawDominoes();
+  dominoBusyN=false;
+  dominoTurnOverlay.classList.remove('show');
+  dominoTurn.textContent='YOUR TURN';
+  dominoTurn.classList.add('turnPulse');
+  dominoSlowPanel.textContent='YOUR TURN: choose one glowing domino. Take your time.';
+
+  if(!dominoBotN.length){
+    dominoBotScoreN+=100;
+    dominoLog.textContent='BOT WON THIS ROUND.';
+    sfx('bad');
+    dominoRoundN++;
+    setTimeout(newDominoes,2600);
+  }
 }
 function drawDomino(){if(dominoPool.length){dominoHandN.push(dominoPool.pop());drawDominoes();sfx('card')}else toast('No dominoes left')}
 
