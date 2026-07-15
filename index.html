@@ -1625,8 +1625,9 @@ function checkLowCoinPrompt(){
 
 <div id="start"><div class="startBox"><div class="logo">Cookie's Casino<span>Arcade</span></div><p>Spades, Solitaire, UNO-style cards, and Cookie Crush in one direct-open arcade.</p><button onclick="startPlayerFlow()">🎰 ENTER</button><div style="margin-top:10px"><span class="cloudStatus" id="startCloudStatus">Connecting to secure player system...</span></div></div></div>
 <div id="toast" class="toast"></div>
+<span id="cloudStatus" style="display:none"></span><span id="xp" style="display:none">0</span>
 <div id="app" class="app">
-<header class="top card"><div class="brand">🍪 Cookie's Casino Arcade</div><div class="bank"><div class="badge" id="coinBadge">🪙 Coins: <span id="coins">0</span></div><button onclick="openCoinStore()">Coin Store</button><button onclick="openAccountModal()" id="accountBtn">My Account</button><span class="accountChip" id="accountChip"><span class="accountAvatar">🍪</span><span id="accountChipName">Guest</span></span><button class="infoMiniBtn" onclick="openPlayerStatsHelp()" title="What do Cloud, XP, and VIP mean?">?</button><span class="cloudStatus" id="cloudStatus" title="Your account, coins, XP, VIP level, and settings are saved online.">Cloud status</span><div class="badge" title="XP means Experience Points. Earn XP by playing and winning games.">XP: <span id="xp">0</span></div><div class="badge" title="VIP is your arcade level. Your level rises as you earn XP.">VIP: <span id="vip">1</span></div></div></header>
+<header class="top card"><div class="brand">🍪 Cookie's Casino Arcade</div><div class="bank"><div class="badge" id="coinBadge">🪙 Coins: <span id="coins">0</span></div><button onclick="openCoinStore()">Coin Store</button><button onclick="openAccountModal()" id="accountBtn">My Account</button><span class="accountChip" id="accountChip"><span class="accountAvatar">🍪</span><span id="accountChipName">Guest</span></span><div class="badge" title="VIP is your arcade level. Your level rises as you earn XP.">VIP: <span id="vip">1</span></div></div></header>
 <nav class="nav"><button onclick="show('lobby')">Lobby</button><button onclick="openSpades()">Spades</button><button onclick="openSolitaire()">Solitaire</button><button onclick="openUno()">UNO</button><button onclick="openCrushPro()">Cookie Crush</button><button onclick="openBingo()">Bingo</button><button onclick="openWordPuzzle()">Word Puzzle</button><button onclick="openChess()">Chess</button><button onclick="openDominoes()">Dominoes</button><button onclick="toggleSound()" id="soundBtn">🔊 Sound On</button></nav>
 
 <section id="lobby" class="page active">
@@ -1890,40 +1891,21 @@ function speakLine(text,playerIndex=0){
 
 
 
-let musicTimer=null,musicStep=0;
-function startCasinoMusic(){
-  if(musicTimer||!state.music)return;
-  const bass=[82.4,98,110,98,82.4,123.5,110,98];
-  const chords=[[164.8,207.7,246.9],[196,246.9,293.7],[146.8,185,220],[174.6,220,261.6]];
-  musicTimer=setInterval(()=>{
-    if(!state.music||!state.sound)return;
-    const beat=musicStep%16;
-    const b=bass[musicStep%8];
-
-    tone(b,.24,'sawtooth',.07);
-    tone(b/2,.20,'triangle',.055);
-    if(beat%2===0)tone(b*2,.10,'square',.03,.025);
-
-    if(beat%4===0){
-      chords[(musicStep/4)%4|0].forEach((f,i)=>tone(f,.36,'sine',.035,i*.018));
-      tone(1350,.025,'square',.018,.02);
-    }
-    if(beat%4===2){
-      tone(760,.045,'triangle',.025,.02);
-      tone(1120,.035,'square',.015,.07);
-    }
-    if(beat%8===6){
-      [523,659,784].forEach((f,i)=>tone(f,.08,'triangle',.025,i*.045));
-    }
-    musicStep++;
-  },265);
-}
-function stopCasinoMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null}}
-function toggleMusic(){
+async function toggleMusic(){
   state.music=!state.music;
   const b=$('musicBtn');
   if(b)b.textContent=state.music?'🎵 Music On':'🎵 Music Off';
-  if(state.music){initAudio();startCasinoMusic();sfx('win')}else stopCasinoMusic();
+  if(state.music){
+    state.sound=true;
+    const ctx=initAudio();
+    if(ctx&&ctx.state==='suspended')await ctx.resume();
+    stopCasinoMusic();
+    startCasinoMusic();
+    sfx('win');
+  }else{
+    stopCasinoMusic();
+  }
+  saveProgressSnapshot();
 }
 
 
@@ -1956,7 +1938,7 @@ function loadArcadeProgress(){return}
 function saveArcadeProgress(){saveProgressSnapshot()}
 
 function render(){
-  $('coins').textContent=state.coins;
+  $('coins').textContent=Number(state.coins||0).toLocaleString();
   $('xp').textContent=state.xp;
   $('vip').textContent=state.vip;
   const badge=$('coinBadge');
@@ -1995,6 +1977,10 @@ async function confirmGameEntry(){
     activeGameKey=key;
     closeCoinModal();
     cb();
+    setTimeout(()=>{
+      const current=document.getElementById(key);
+      if(current&&!current.classList.contains('active'))show(key);
+    },80);
     toast('-'+cost+' COINS • GOOD LUCK!');
     sfx('card');
   }catch(error){
@@ -2055,15 +2041,7 @@ let authMode='login';
 let progressSaveTimer=null;
 
 
-function openPlayerStatsHelp(){
-  alert(
-    'PLAYER STATUS\n\n'+
-    'Cloud saved: Your account and settings are saved online.\n\n'+
-    'XP: Experience Points earned by playing and winning.\n\n'+
-    'VIP: Your arcade level. Your VIP level rises as XP builds.\n\n'+
-    'Cookie Coins: Virtual game credits with no cash value.'
-  );
-}
+
 
 function setCloudStatus(text,type=''){
   for(const id of ['cloudStatus','startCloudStatus']){
@@ -2145,22 +2123,129 @@ async function startPlayerFlow(){
 }
 
 
+
+
+
+let audioCtx=null;
+let musicTimer=null;
+let musicStep=0;
+
+function initAudio(){
+  if(!audioCtx){
+    const Ctx=window.AudioContext||window.webkitAudioContext;
+    if(!Ctx)return null;
+    audioCtx=new Ctx();
+  }
+  return audioCtx;
+}
+
+function tone(frequency,duration=.08,type='sine',volume=.05,delay=0){
+  if(!state.sound)return;
+  const ctx=initAudio();
+  if(!ctx)return;
+  const start=ctx.currentTime+Math.max(0,delay);
+  const osc=ctx.createOscillator();
+  const gain=ctx.createGain();
+  osc.type=type;
+  osc.frequency.setValueAtTime(frequency,start);
+  gain.gain.setValueAtTime(.0001,start);
+  gain.gain.exponentialRampToValueAtTime(Math.max(.0001,volume),start+.01);
+  gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(start);
+  osc.stop(start+duration+.03);
+}
+
+function noiseBurst(duration=.12,volume=.05,delay=0){
+  if(!state.sound)return;
+  const ctx=initAudio();
+  if(!ctx)return;
+  const length=Math.max(1,Math.floor(ctx.sampleRate*duration));
+  const buffer=ctx.createBuffer(1,length,ctx.sampleRate);
+  const data=buffer.getChannelData(0);
+  for(let i=0;i<length;i++)data[i]=(Math.random()*2-1)*(1-i/length);
+  const source=ctx.createBufferSource();
+  const gain=ctx.createGain();
+  const start=ctx.currentTime+delay;
+  source.buffer=buffer;
+  gain.gain.setValueAtTime(volume,start);
+  gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
+  source.connect(gain);
+  gain.connect(ctx.destination);
+  source.start(start);
+}
+
+function sfx(name){
+  if(!state.sound)return;
+  if(name==='enter'){
+    [261,329,392,523].forEach((f,i)=>tone(f,.18,'triangle',.07,i*.07));
+    noiseBurst(.18,.025,.08);
+  }else if(name==='card'||name==='click'){
+    tone(420,.045,'triangle',.045);
+    tone(620,.035,'triangle',.025,.035);
+  }else if(name==='shuffle'){
+    for(let i=0;i<5;i++)noiseBurst(.055,.025,i*.055);
+  }else if(name==='win'){
+    [523,659,784,1046].forEach((f,i)=>tone(f,.18,'triangle',.065,i*.08));
+  }else if(name==='bad'){
+    tone(150,.16,'sawtooth',.055);
+    tone(105,.20,'sawtooth',.05,.09);
+  }else if(name==='crunch'){
+    noiseBurst(.22,.10);
+    tone(90,.18,'square',.08);
+  }else if(name==='uno'){
+    tone(330,.12,'square',.065);
+    tone(660,.14,'triangle',.07,.08);
+  }else{
+    tone(350,.045,'triangle',.025);
+  }
+}
+
+function startCasinoMusic(){
+  if(musicTimer||!state.music)return;
+  const bass=[82.4,98,110,98,123.5,110,98,73.4];
+  musicTimer=setInterval(()=>{
+    if(!state.music||!state.sound)return;
+    const beat=musicStep%16;
+    const b=bass[musicStep%bass.length];
+    tone(b,.20,'sawtooth',.035);
+    if(beat%2===0)tone(b*2,.075,'triangle',.018,.02);
+    if(beat%4===0){
+      tone(523,.06,'triangle',.022,.03);
+      tone(659,.06,'triangle',.018,.07);
+    }
+    if(beat%8===6){
+      tone(1046,.025,'square',.018);
+      noiseBurst(.035,.012,.03);
+    }
+    musicStep++;
+  },330);
+}
+
+function stopCasinoMusic(){
+  if(musicTimer){
+    clearInterval(musicTimer);
+    musicTimer=null;
+  }
+}
+
 async function activateArcadeAudio(){
   try{
-    initAudio();
-    if(audioCtx && audioCtx.state==='suspended'){
-      await audioCtx.resume();
-    }
+    const ctx=initAudio();
+    if(ctx&&ctx.state==='suspended')await ctx.resume();
     state.sound=true;
     state.music=true;
-    if(window.soundBtn)soundBtn.textContent='🔊 Sound On';
-    if(window.musicBtn)musicBtn.textContent='🎵 Music On';
+    const soundButton=document.getElementById('soundBtn');
+    const musicButton=document.getElementById('musicBtn');
+    if(soundButton)soundButton.textContent='🔊 Sound On';
+    if(musicButton)musicButton.textContent='🎵 Music On';
+    stopCasinoMusic();
     startCasinoMusic();
-    tone(330,.08,'triangle',.05);
-    tone(495,.10,'triangle',.05,.06);
+    sfx('enter');
     saveProgressSnapshot();
   }catch(error){
-    console.warn('Audio activation:',error);
+    console.error('Audio could not start:',error);
   }
 }
 
@@ -2442,7 +2527,21 @@ function lobbyLightShow(){
   setTimeout(()=>[98,130,164,196].forEach((f,i)=>tone(f,.8,'sawtooth',.05,i*.12)),700);
   toast('COOKIE’S MEGA STAR LIGHT SHOW!');
 }
-function toggleSound(){state.sound=!state.sound;const a=$('soundBtn'),b=$('lobbySoundBtn');if(a)a.textContent=state.sound?'🔊 Sound On':'🔇 Sound Off';if(b)b.textContent=state.sound?'🔊 Casino Sound On':'🔇 Casino Sound Off';if(state.sound)sfx('click')}
+async function toggleSound(){
+  state.sound=!state.sound;
+  const a=$('soundBtn'),b=$('lobbySoundBtn');
+  if(a)a.textContent=state.sound?'🔊 Sound On':'🔇 Sound Off';
+  if(b)b.textContent=state.sound?'🔊 Casino Sound On':'🔇 Casino Sound Off';
+  if(state.sound){
+    const ctx=initAudio();
+    if(ctx&&ctx.state==='suspended')await ctx.resume();
+    if(state.music)startCasinoMusic();
+    sfx('click');
+  }else{
+    stopCasinoMusic();
+  }
+  saveProgressSnapshot();
+}
 
 const suits=['♠','♥','♦','♣'],ranks=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
 function deck(){let d=[];suits.forEach(s=>ranks.forEach(r=>d.push({s,r,face:true})));return d.sort(()=>Math.random()-.5)}
@@ -2452,6 +2551,20 @@ function htmlCard(c){return '<div>'+c.r+'</div><div>'+c.s+'</div>'}
 
 /* Spades */
 let spHands=[[],[],[],[]],spTrick=[],ct=0,ot=0;
+
+function show(id){
+  document.querySelectorAll('.page').forEach(page=>{
+    page.classList.remove('active');
+    page.style.display='none';
+  });
+  const target=document.getElementById(id);
+  if(!target){console.error('Missing page:',id);return}
+  target.style.display='block';
+  target.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  try{sfx('page')}catch(error){}
+}
+
 function openSpades(){requestGameEntry('spades',()=>{show('spades');newSpadesPremium()})}
 function newSpades(){let d=deck();spHands=[[],[],[],[]];for(let i=0;i<52;i++)spHands[i%4].push(d[i]);spTrick=[];ct=0;ot=0;drawSpades();$('spLog').textContent='Cookie and Sweet Sugar are partners. Play a card to begin.'}
 function drawSpades(){
