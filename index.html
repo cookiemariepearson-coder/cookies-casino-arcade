@@ -1553,7 +1553,7 @@ button:active{transform:translateY(1px) scale(.98)}
   </div>
 </div>
 
-<div id="start"><div class="startBox"><div class="logo">Cookie's Casino<span>Arcade</span></div><p>Spades, Solitaire, UNO-style cards, and Cookie Crush in one direct-open arcade.</p><button onclick="startPlayerFlow()">🎰 SIGN IN & ENTER</button><div style="margin-top:10px"><span class="cloudStatus" id="startCloudStatus">Connecting to secure player system...</span></div></div></div>
+<div id="start"><div class="startBox"><div class="logo">Cookie's Casino<span>Arcade</span></div><p>Spades, Solitaire, UNO-style cards, and Cookie Crush in one direct-open arcade.</p><button onclick="startPlayerFlow()">🎰 ENTER</button><div style="margin-top:10px"><span class="cloudStatus" id="startCloudStatus">Connecting to secure player system...</span></div></div></div>
 <div id="toast" class="toast"></div>
 <div id="app" class="app">
 <header class="top card"><div class="brand">🍪 Cookie's Casino Arcade</div><div class="bank"><div class="badge" id="coinBadge">🪙 Coins: <span id="coins">0</span></div><button onclick="openCoinStore()">Coin Store</button><button onclick="openAccountModal()" id="accountBtn">My Account</button><span class="accountChip" id="accountChip"><span class="accountAvatar">🍪</span><span id="accountChipName">Guest</span></span><span class="cloudStatus" id="cloudStatus">Offline</span><div class="badge">XP: <span id="xp">0</span></div><div class="badge">VIP: <span id="vip">1</span></div></div></header>
@@ -2035,21 +2035,51 @@ async function applyAuthSession(session){
 }
 
 async function startPlayerFlow(){
-  if(currentUser){
-    enterArcade();
-    return;
-  }
-
-  if(supabaseClient){
-    const {data:{session}}=await supabaseClient.auth.getSession();
-    if(session){
-      await applyAuthSession(session);
-      enterArcade();
+  try{
+    // If the confirmed account is already loaded, enter immediately.
+    if(currentUser){
+      openArcadeScreen();
       return;
     }
-  }
 
-  openAuthModal('login');
+    // Check once for a restored Supabase session.
+    if(supabaseClient){
+      const result=await supabaseClient.auth.getSession();
+      if(result.error)throw result.error;
+
+      if(result.data && result.data.session){
+        currentSession=result.data.session;
+        currentUser=result.data.session.user;
+        await refreshPlayerAccount();
+        openArcadeScreen();
+        return;
+      }
+    }
+
+    // No active session: show the normal sign-in form.
+    openAuthModal('login');
+  }catch(error){
+    console.error(error);
+    openAuthModal('login');
+    authMessage.textContent=error.message||'Please sign in.';
+  }
+}
+
+function openArcadeScreen(){
+  const startScreen=$('start');
+  const appScreen=$('app');
+
+  if(startScreen)startScreen.style.display='none';
+  if(appScreen)appScreen.style.display='block';
+
+  try{initAudio()}catch(error){console.warn(error)}
+  try{sfx('enter')}catch(error){}
+  try{startCasinoMusic()}catch(error){}
+  try{toast("Welcome to Cookie's Casino Arcade!")}catch(error){}
+  try{createCoinRain()}catch(error){}
+  try{casinoAmbience()}catch(error){}
+  try{render()}catch(error){console.warn(error)}
+  try{checkCheckoutReturn()}catch(error){}
 }
 
 function openAuthModal(mode='login'){
@@ -2094,7 +2124,7 @@ async function submitAuth(event){
       authMessage.textContent='Signed in!';
       closeAuthModal();
       await applyAuthSession(data.session);
-      enterArcade();
+      openArcadeScreen();
     }
   }catch(error){
     authMessage.textContent=error.message||'Account request failed.';
@@ -2283,11 +2313,11 @@ async function checkCheckoutReturn(){
 }
 
 function enterArcade(){
-  if(!currentUser){openAuthModal('login');return}
-  initAudio();sfx('enter');startCasinoMusic();
-  $('start').style.display='none';$('app').style.display='block';
-  toast("Welcome back to Cookie's Casino Arcade!");
-  createCoinRain();casinoAmbience();render();checkCheckoutReturn();
+  if(!currentUser){
+    openAuthModal('login');
+    return;
+  }
+  openArcadeScreen();
 }
 function casinoAmbience(){
   if(ambienceTimer)return;
