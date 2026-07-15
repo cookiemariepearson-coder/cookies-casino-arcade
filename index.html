@@ -1769,9 +1769,7 @@ button:active{transform:translateY(1px) scale(.98)}
 <section id="dominoes" class="page"><div class="megaGame card"><div class="gameHead"><h1>🁫 Cookie Domino House</h1><button onclick="newDominoes()">New Round</button></div><div class="dominoLayout"><div class="dominoTable"><div class="dominoHelp"><b>How to play:</b> Click a glowing domino that matches either open end. If nothing glows, press Draw Domino.</div><div class="dominoOpenEnds"><span>Left: <b id="dominoLeftEnd">-</b></span><span>Right: <b id="dominoRightEnd">-</b></span></div><div><h3 style="text-align:center">Bot: <span id="dominoBotCount">7</span> dominoes</h3></div><div id="dominoChain" class="dominoChain"></div><div><div id="dominoHand" class="dominoHand"></div></div></div><aside class="side card"><div class="dominoSlowPanel" id="dominoSlowPanel">Step 1: Look at the Left and Right numbers. Step 2: Click a glowing domino that matches.</div><div class="dominoTurn" id="dominoTurn">Your turn</div><div class="dominoScoreboard"><div class="stat"><small>Cookie Score</small><b id="dominoCookieScore">0</b></div><div class="stat"><small>Bot Score</small><b id="dominoBotScore">0</b></div><div class="stat"><small>Round</small><b id="dominoRound">1</b></div></div><div class="stats"><div class="stat"><small>Your Hand</small><b id="dominoCount">7</b></div><div class="stat"><small>Rounds Won</small><b id="dominoWins">0</b></div></div><button onclick="drawDomino()">Draw Domino</button><div id="dominoLog" class="log">Match either open end.</div></aside></div></div></section>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-initPlayerCloud();
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const state={coins:0,xp:0,vip:1,sound:true,voice:true,music:true};let ctx=null;
 function $(id){return document.getElementById(id)}
@@ -2027,11 +2025,31 @@ async function applyAuthSession(session){
     return;
   }
   await refreshPlayerAccount();
+
+  // After email confirmation or session restoration, enter automatically.
+  const startScreen=$('start');
+  const appScreen=$('app');
+  if(startScreen && appScreen && startScreen.style.display!=='none'){
+    setTimeout(()=>enterArcade(),150);
+  }
 }
 
-function startPlayerFlow(){
-  if(currentUser)enterArcade();
-  else openAuthModal('login');
+async function startPlayerFlow(){
+  if(currentUser){
+    enterArcade();
+    return;
+  }
+
+  if(supabaseClient){
+    const {data:{session}}=await supabaseClient.auth.getSession();
+    if(session){
+      await applyAuthSession(session);
+      enterArcade();
+      return;
+    }
+  }
+
+  openAuthModal('login');
 }
 
 function openAuthModal(mode='login'){
@@ -3692,6 +3710,8 @@ function dominoBotTurn(){
  dominoBotN.splice(i,1);dominoLog.textContent='Bot played. Your turn—choose a glowing domino that matches '+dominoChainN[0][0]+' or '+dominoChainN[dominoChainN.length-1][1]+'.';tone(150,.10,'square',.06);tone(220,.08,'triangle',.05,.05);drawDominoes();if(window.dominoTurn)dominoTurn.textContent='Your turn';if(window.dominoSlowPanel)dominoSlowPanel.textContent='Your turn: match the Left or Right number with a glowing domino.';if(!dominoBotN.length){dominoBotScoreN+=100;toast('BOT WINS DOMINOES');tone(110,.2,'sawtooth',.07);dominoRoundN++;setTimeout(newDominoes,1600)}
 }
 function drawDomino(){if(dominoPool.length){dominoHandN.push(dominoPool.pop());drawDominoes();sfx('card')}else toast('No dominoes left')}
+
+
 window.addEventListener("DOMContentLoaded", initPlayerCloud);
 </script>
 </body>
